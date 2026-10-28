@@ -33,7 +33,7 @@ src/assets/capas/
   Marina Sena - Por Supuesto.jpg   (capa opcional, mesmo nome)
 ```
 
-Se o arquivo não tiver ` - ` no nome, o nome inteiro vira o título e o artista fica "Artista desconhecido".
+Se o arquivo não tiver ` - ` no nome, o nome inteiro vira o título e o artista fica "DJ RapWell" (o padrão, definido em `ARTISTA_PADRAO` no topo de `src/lib/tracks.js` — troque ali se quiser outro nome).
 
 ## Funcionalidades do player
 

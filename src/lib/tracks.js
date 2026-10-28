@@ -4,7 +4,7 @@
 // soltar os arquivos nessas pastas.
 //
 // Convenção de nome sugerida: "Artista - Título.mp3". Sem o " - ", o nome
-// inteiro do arquivo vira o título e o artista fica "Artista desconhecido".
+// inteiro do arquivo vira o título e o artista fica ARTISTA_PADRAO.
 
 const musicModules = import.meta.glob('../assets/musicas/*.{mp3,wav,ogg,m4a}', {
   eager: true,
@@ -15,6 +15,8 @@ const capaModules = import.meta.glob('../assets/capas/*.{jpg,jpeg,png,webp}', {
   eager: true,
   import: 'default',
 })
+
+const ARTISTA_PADRAO = 'DJ RapWell'
 
 function nomeBase(caminho) {
   const arquivo = caminho.split('/').pop()
@@ -31,7 +33,7 @@ function extrairTituloArtista(nome) {
   if (partes.length >= 2) {
     return { artista: partes[0].trim(), titulo: partes.slice(1).join(' - ').trim() }
   }
-  return { artista: 'Artista desconhecido', titulo: nome.trim() }
+  return { artista: ARTISTA_PADRAO, titulo: nome.trim() }
 }
 
 export const faixas = Object.entries(musicModules)
