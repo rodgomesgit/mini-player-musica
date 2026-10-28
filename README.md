@@ -1,4 +1,4 @@
-# Mini Player 🎵
+# Rw Player 🎵
 
 Um mini player de música no estilo Spotify Web, porém bem mais simples: só a lista de reprodução e o player. Feito com **React + Vite + Tailwind CSS**, sem backend — as músicas ficam junto com o código e tudo roda no navegador.
 
