@@ -11,7 +11,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-neutral-900 to-neutral-950">
       <header className="px-6 pt-8 pb-4">
-        <h1 className="text-3xl font-bold tracking-tight">🎵 Rw Player</h1>
+        <h1> className="text-3xl font-bold tracking-tight">🎵 Rw Player </h1>
       </header>
 
       <main className="px-4 sm:px-6 max-w-5xl mx-auto pb-28">
