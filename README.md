@@ -14,7 +14,8 @@ Abre em `http://localhost:5173`.
 ## Como adicionar músicas
 
 1. Coloque os arquivos de áudio (`.mp3`, `.wav`, `.ogg` ou `.m4a`) dentro de `src/assets/musicas/`.
-2. (Opcional) Pra dar uma capa pra faixa, coloque uma imagem (`.jpg`, `.jpeg`, `.png` ou `.webp`) em `src/assets/capas/` **com o mesmo nome do arquivo de áudio** (só muda a extensão). Sem capa, aparece um ícone de nota musical no lugar.
+2. (Opcional) Pra dar uma capa pra faixa, coloque uma imagem (`.jpg`, `.jpeg`, `.png` ou `.webp`) em `src/assets/capas/` **com o mesmo nome do arquivo de áudio** (só muda a extensão). Sem capa própria, a faixa usa a capa padrão (se existir) ou um ícone de nota musical.
+3. (Opcional) Pra definir uma **capa padrão**, usada em toda música que não tiver uma capa específica, coloque uma imagem chamada `padrao.jpg` (ou `.jpeg`/`.png`/`.webp`) em `src/assets/capas/`.
 
 A playlist é montada **automaticamente** a partir do que estiver nessas pastas — não precisa editar nenhum código nem manter uma lista manual.
 

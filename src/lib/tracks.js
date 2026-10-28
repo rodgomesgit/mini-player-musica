@@ -5,6 +5,9 @@
 //
 // Convenção de nome sugerida: "Artista - Título.mp3". Sem o " - ", o nome
 // inteiro do arquivo vira o título e o artista fica ARTISTA_PADRAO.
+//
+// Um arquivo "padrao.jpg" (ou .jpeg/.png/.webp) em src/assets/capas/ vira a
+// capa de qualquer música que não tenha uma capa própria com o mesmo nome.
 
 const musicModules = import.meta.glob('../assets/musicas/*.{mp3,wav,ogg,m4a}', {
   eager: true,
@@ -17,15 +20,24 @@ const capaModules = import.meta.glob('../assets/capas/*.{jpg,jpeg,png,webp}', {
 })
 
 const ARTISTA_PADRAO = 'DJ RapWell'
+const NOME_CAPA_PADRAO = 'padrao'
 
 function nomeBase(caminho) {
   const arquivo = caminho.split('/').pop()
   return arquivo.replace(/\.[^.]+$/, '')
 }
 
+// Um arquivo chamado "padrao.*" em src/assets/capas/ vira a capa usada em
+// qualquer música que não tenha uma capa própria (mesmo nome do áudio).
+let capaPadrao = null
 const capasPorNomeBase = new Map()
 for (const [caminho, url] of Object.entries(capaModules)) {
-  capasPorNomeBase.set(nomeBase(caminho), url)
+  const base = nomeBase(caminho)
+  if (base === NOME_CAPA_PADRAO) {
+    capaPadrao = url
+  } else {
+    capasPorNomeBase.set(base, url)
+  }
 }
 
 function extrairTituloArtista(nome) {
@@ -45,7 +57,7 @@ export const faixas = Object.entries(musicModules)
       titulo,
       artista,
       src: url,
-      capa: capasPorNomeBase.get(base) || null,
+      capa: capasPorNomeBase.get(base) || capaPadrao,
     }
   })
   .sort((a, b) => a.titulo.localeCompare(b.titulo, 'pt-BR'))
