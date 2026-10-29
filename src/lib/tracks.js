@@ -48,16 +48,20 @@ function extrairTituloArtista(nome) {
   return { artista: ARTISTA_PADRAO, titulo: nome.trim() }
 }
 
+// Também usada pras músicas importadas do aparelho, que seguem a mesma
+// convenção de nome e recebem a capa padrão.
+export function criarFaixa({ id, nomeArquivo, src }) {
+  const base = nomeBase(nomeArquivo)
+  const { artista, titulo } = extrairTituloArtista(base)
+  return {
+    id,
+    titulo,
+    artista,
+    src,
+    capa: capasPorNomeBase.get(base) || capaPadrao,
+  }
+}
+
 export const faixas = Object.entries(musicModules)
-  .map(([caminho, url]) => {
-    const base = nomeBase(caminho)
-    const { artista, titulo } = extrairTituloArtista(base)
-    return {
-      id: caminho,
-      titulo,
-      artista,
-      src: url,
-      capa: capasPorNomeBase.get(base) || capaPadrao,
-    }
-  })
+  .map(([caminho, url]) => criarFaixa({ id: caminho, nomeArquivo: caminho, src: url }))
   .sort((a, b) => a.titulo.localeCompare(b.titulo, 'pt-BR'))

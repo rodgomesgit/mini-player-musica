@@ -31,8 +31,10 @@ export function Player({
   const semFaixa = !faixaAtual
 
   return (
-    <footer className="fixed bottom-0 inset-x-0 border-t border-white/10 bg-neutral-950/95 backdrop-blur px-4 py-3">
-      <div className="max-w-5xl mx-auto grid grid-cols-[1fr_2fr_1fr] items-center gap-4">
+    <footer className="fixed bottom-0 inset-x-0 border-t border-white/10 bg-neutral-950/95 backdrop-blur px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+      {/* No celular: faixa em cima, controles embaixo; o volume fica com os
+          botões físicos do aparelho. */}
+      <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-[1fr_2fr_1fr] items-center gap-2 sm:gap-4">
         {/* Faixa atual */}
         <div className="flex items-center gap-3 min-w-0">
           <CapaFaixa capa={faixaAtual?.capa} titulo={faixaAtual?.titulo} />
@@ -48,7 +50,7 @@ export function Player({
 
         {/* Controles + barra de progresso */}
         <div className="flex flex-col items-center gap-1.5">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6 sm:gap-4">
             <button
               type="button"
               onClick={onAlternarEmbaralhar}
@@ -121,7 +123,7 @@ export function Player({
         </div>
 
         {/* Volume */}
-        <div className="flex items-center justify-end gap-2">
+        <div className="hidden sm:flex items-center justify-end gap-2">
           {volume === 0 ? (
             <IconeVolumeMudo width={18} height={18} className="text-neutral-400" />
           ) : (

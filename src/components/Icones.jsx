@@ -102,3 +102,54 @@ export function IconeOndaSonora(props) {
     </Svg>
   )
 }
+
+export function IconeCoracao({ preenchido, ...props }) {
+  return (
+    <Svg {...props}>
+      <path
+        d="M12 20.5s-7.5-4.6-9.2-9.1C1.6 8.2 3.7 4.5 7.3 4.5c2 0 3.6 1.1 4.7 2.7 1.1-1.6 2.7-2.7 4.7-2.7 3.6 0 5.7 3.7 4.5 6.9-1.7 4.5-9.2 9.1-9.2 9.1Z"
+        fill={preenchido ? 'currentColor' : 'none'}
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  )
+}
+
+export function IconeBusca(props) {
+  return (
+    <Svg {...props}>
+      <path
+        d="m20 20-4.2-4.2M17 10.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </Svg>
+  )
+}
+
+export function IconeAdicionar(props) {
+  return (
+    <Svg {...props}>
+      <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+    </Svg>
+  )
+}
+
+export function IconeLixeira(props) {
+  return (
+    <Svg {...props}>
+      <path
+        d="M4.5 7h15M10 11v6m4-6v6M6.5 7l.8 11.2A2 2 0 0 0 9.3 20h5.4a2 2 0 0 0 2-1.8L17.5 7M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  )
+}

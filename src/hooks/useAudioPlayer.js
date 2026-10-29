@@ -1,12 +1,15 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-export function useAudioPlayer(faixas) {
+// `fila` é a lista que está na tela (com busca/filtro aplicados): próxima,
+// anterior e embaralhar andam por ela. `todas` serve pra continuar mostrando a
+// faixa atual mesmo quando ela some da lista por causa de um filtro.
+export function useAudioPlayer(fila, todas) {
   const audioRef = useRef(null)
   if (!audioRef.current) {
     audioRef.current = new Audio()
   }
 
-  const [indiceAtual, setIndiceAtual] = useState(null)
+  const [idAtual, setIdAtual] = useState(null)
   const [tocando, setTocando] = useState(false)
   const [progresso, setProgresso] = useState(0)
   const [duracao, setDuracao] = useState(0)
@@ -14,7 +17,11 @@ export function useAudioPlayer(faixas) {
   const [embaralhar, setEmbaralhar] = useState(false)
   const [repetir, setRepetir] = useState(false)
 
-  const faixaAtual = indiceAtual !== null ? faixas[indiceAtual] ?? null : null
+  const faixaAtual = useMemo(
+    () => (idAtual !== null ? todas.find((f) => f.id === idAtual) ?? null : null),
+    [todas, idAtual],
+  )
+  const indiceNaFila = idAtual !== null ? fila.findIndex((f) => f.id === idAtual) : -1
 
   // Mantém uma referência síncrona da intenção de tocar, pra decidir (sem
   // recriar o efeito de troca de faixa) se deve dar play automático ao
@@ -32,7 +39,9 @@ export function useAudioPlayer(faixas) {
   useEffect(() => {
     const audio = audioRef.current
     if (!faixaAtual) {
+      audio.pause()
       audio.removeAttribute('src')
+      setTocando(false)
       setProgresso(0)
       setDuracao(0)
       return
@@ -45,43 +54,39 @@ export function useAudioPlayer(faixas) {
     }
   }, [faixaAtual?.src])
 
-  const proximoIndiceAleatorio = useCallback(() => {
-    if (faixas.length <= 1) return 0
+  const idAleatorio = useCallback(() => {
+    if (fila.length <= 1) return fila[0]?.id ?? null
     let novo
     do {
-      novo = Math.floor(Math.random() * faixas.length)
-    } while (novo === indiceAtual)
+      novo = fila[Math.floor(Math.random() * fila.length)].id
+    } while (novo === idAtual)
     return novo
-  }, [faixas.length, indiceAtual])
+  }, [fila, idAtual])
 
   const proxima = useCallback(() => {
-    if (faixas.length === 0) return
+    if (fila.length === 0) return
     const novo = embaralhar
-      ? proximoIndiceAleatorio()
-      : indiceAtual === null
-        ? 0
-        : (indiceAtual + 1) % faixas.length
-    setIndiceAtual(novo)
+      ? idAleatorio()
+      : fila[indiceNaFila === -1 ? 0 : (indiceNaFila + 1) % fila.length].id
+    setIdAtual(novo)
     setTocando(true)
-  }, [faixas.length, embaralhar, indiceAtual, proximoIndiceAleatorio])
+  }, [fila, embaralhar, indiceNaFila, idAleatorio])
 
   const anterior = useCallback(() => {
-    if (faixas.length === 0) return
+    if (fila.length === 0) return
     // Como no Spotify: se já tocou mais de 3s, volta pro início da mesma
     // faixa em vez de ir pra anterior.
-    if (indiceAtual !== null && audioRef.current.currentTime > 3) {
+    if (idAtual !== null && audioRef.current.currentTime > 3) {
       audioRef.current.currentTime = 0
       setProgresso(0)
       return
     }
     const novo = embaralhar
-      ? proximoIndiceAleatorio()
-      : indiceAtual === null
-        ? faixas.length - 1
-        : (indiceAtual - 1 + faixas.length) % faixas.length
-    setIndiceAtual(novo)
+      ? idAleatorio()
+      : fila[indiceNaFila === -1 ? fila.length - 1 : (indiceNaFila - 1 + fila.length) % fila.length].id
+    setIdAtual(novo)
     setTocando(true)
-  }, [faixas.length, embaralhar, indiceAtual, proximoIndiceAleatorio])
+  }, [fila, embaralhar, idAtual, indiceNaFila, idAleatorio])
 
   // Listeners do elemento de áudio.
   useEffect(() => {
@@ -112,22 +117,26 @@ export function useAudioPlayer(faixas) {
     }
   }, [repetir, proxima])
 
-  const tocarFaixa = useCallback((indice) => {
-    setIndiceAtual(indice)
+  const tocarFaixa = useCallback((id) => {
+    setIdAtual(id)
     setTocando(true)
   }, [])
 
-  const alternarPlayPause = useCallback(() => {
+  const tocar = useCallback(() => {
     if (!faixaAtual) return
-    const audio = audioRef.current
-    if (tocando) {
-      audio.pause()
-      setTocando(false)
-    } else {
-      audio.play().catch(() => {})
-      setTocando(true)
-    }
-  }, [tocando, faixaAtual])
+    audioRef.current.play().catch(() => {})
+    setTocando(true)
+  }, [faixaAtual])
+
+  const pausar = useCallback(() => {
+    audioRef.current.pause()
+    setTocando(false)
+  }, [])
+
+  const alternarPlayPause = useCallback(() => {
+    if (tocando) pausar()
+    else tocar()
+  }, [tocando, tocar, pausar])
 
   const buscar = useCallback((segundos) => {
     audioRef.current.currentTime = segundos
@@ -136,7 +145,7 @@ export function useAudioPlayer(faixas) {
 
   return {
     faixaAtual,
-    indiceAtual,
+    idAtual,
     tocando,
     progresso,
     duracao,
@@ -144,6 +153,8 @@ export function useAudioPlayer(faixas) {
     embaralhar,
     repetir,
     tocarFaixa,
+    tocar,
+    pausar,
     alternarPlayPause,
     proxima,
     anterior,

@@ -8,7 +8,7 @@ body {
   margin: 0;
   background-color: #0a0a0a;
   color: #f2f2f2;
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  font-family: "Inter Variable", system-ui, -apple-system, sans-serif;
 }
 
 ::-webkit-scrollbar {
