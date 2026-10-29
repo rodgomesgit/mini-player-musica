@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react'
+import { BoasVindas } from './components/BoasVindas.jsx'
 import { Player } from './components/Player.jsx'
 import { Playlist } from './components/Playlist.jsx'
 import { TelaTocando } from './components/TelaTocando.jsx'
@@ -52,6 +53,7 @@ export default function App() {
   const [busca, setBusca] = useState('')
   const [filtroEscolhido, setFiltro] = useState('todas')
   const [telaAberta, setTelaAberta] = useState(false)
+  const [boasVindas, setBoasVindas] = useState(true)
   const estadoAtualizacao = useSyncExternalStore(ouvirEstadoAtualizacao, lerEstadoAtualizacao)
 
   const idsSalvos = useMemo(() => new Set([...favoritos, ...playlists.flatMap((p) => p.faixas)]), [favoritos, playlists])
@@ -146,6 +148,16 @@ export default function App() {
     acoes: acoesMidia,
   })
 
+  // O que foi digitado nas boas-vindas vira a busca: na biblioteca se tiver
+  // alguma música que combine, senão no Explorar (Audius).
+  function buscarDasBoasVindas(texto) {
+    const termo = normalizar(texto)
+    const temNaBiblioteca = biblioteca.some((f) => normalizar(`${f.titulo} ${f.artista}`).includes(termo))
+    setBusca(texto)
+    setFiltro(temNaBiblioteca ? 'todas' : 'explorar')
+    setBoasVindas(false)
+  }
+
   async function aoImportar(selecionados) {
     try {
       const quantidade = await importar(selecionados)
@@ -215,6 +227,16 @@ export default function App() {
         onAlternarRepetir={() => player.setRepetir((v) => !v)}
         onAbrirTela={abrirTela}
       />
+
+      {boasVindas && (
+        <BoasVindas
+          onBuscar={buscarDasBoasVindas}
+          onEntrar={(destino) => {
+            setFiltro(destino)
+            setBoasVindas(false)
+          }}
+        />
+      )}
 
       {telaAberta && (
         <TelaTocando

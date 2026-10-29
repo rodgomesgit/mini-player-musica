@@ -85,3 +85,26 @@ input[type="range"].player-slider-grande::-moz-range-thumb {
 .tela-tocando {
   animation: subir-tela 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
+
+/* Tela de boas-vindas: aparece suave e o mascote flutua de leve. */
+@keyframes aparecer {
+  from {
+    opacity: 0;
+  }
+}
+.boas-vindas {
+  animation: aparecer 0.35s ease-out;
+}
+@keyframes flutuar {
+  50% {
+    transform: translateY(-8px);
+  }
+}
+.mascote-flutuando {
+  animation: flutuar 3.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mascote-flutuando {
+    animation: none;
+  }
+}
