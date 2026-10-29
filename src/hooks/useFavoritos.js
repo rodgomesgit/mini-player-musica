@@ -30,5 +30,10 @@ export function useFavoritos() {
     })
   }, [])
 
-  return { favoritos, alternarFavorito }
+  // Troca ids antigos por novos, ex.: { idAntigo: idNovo }.
+  const trocarIds = useCallback((mapa) => {
+    setFavoritos((atual) => new Set([...atual].map((id) => mapa[id] ?? id)))
+  }, [])
+
+  return { favoritos, alternarFavorito, trocarIds }
 }

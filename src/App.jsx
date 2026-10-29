@@ -16,11 +16,37 @@ function normalizar(texto) {
   return texto.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
 }
 
+// As músicas do DJ vinham dentro do app, com ids "../assets/musicas/Título.mp3".
+// Agora vêm do catálogo online: favoritos e playlists que apontavam pra elas
+// passam a apontar pra versão online de mesmo título assim que ela existir.
+const PREFIXO_EMBUTIDA = '../assets/musicas/'
+
+function idsParaMigrar(ids, online) {
+  const porTitulo = new Map(online.map((f) => [normalizar(f.titulo), f.id]))
+  const mapa = {}
+  for (const id of ids) {
+    if (!id.startsWith(PREFIXO_EMBUTIDA)) continue
+    const titulo = id.slice(PREFIXO_EMBUTIDA.length).replace(/\.[^.]+$/, '')
+    const novo = porTitulo.get(normalizar(titulo))
+    if (novo) mapa[id] = novo
+  }
+  return mapa
+}
+
 export default function App() {
   const { importadas, importando, importar, remover } = useMusicasImportadas()
   const online = useCatalogoOnline()
-  const { favoritos, alternarFavorito } = useFavoritos()
-  const { playlists, criar, renomear, excluir, alternarFaixa, removerFaixaDeTodas } = usePlaylists()
+  const { favoritos, alternarFavorito, trocarIds: trocarIdsFavoritos } = useFavoritos()
+  const { playlists, criar, renomear, excluir, alternarFaixa, removerFaixaDeTodas, trocarIds: trocarIdsPlaylists } =
+    usePlaylists()
+
+  useEffect(() => {
+    if (online.length === 0) return
+    const mapa = idsParaMigrar([...favoritos, ...playlists.flatMap((p) => p.faixas)], online)
+    if (Object.keys(mapa).length === 0) return
+    trocarIdsFavoritos(mapa)
+    trocarIdsPlaylists(mapa)
+  }, [online, favoritos, playlists, trocarIdsFavoritos, trocarIdsPlaylists])
   const [busca, setBusca] = useState('')
   const [filtroEscolhido, setFiltro] = useState('todas')
   const [telaAberta, setTelaAberta] = useState(false)

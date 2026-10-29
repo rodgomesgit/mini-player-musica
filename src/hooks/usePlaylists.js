@@ -54,5 +54,12 @@ export function usePlaylists() {
     )
   }, [])
 
-  return { playlists, criar, renomear, excluir, alternarFaixa, removerFaixaDeTodas }
+  // Troca ids antigos por novos em todas as playlists, ex.: { idAntigo: idNovo }.
+  const trocarIds = useCallback((mapa) => {
+    setPlaylists((atual) =>
+      atual.map((p) => ({ ...p, faixas: [...new Set(p.faixas.map((f) => mapa[f] ?? f))] })),
+    )
+  }, [])
+
+  return { playlists, criar, renomear, excluir, alternarFaixa, removerFaixaDeTodas, trocarIds }
 }

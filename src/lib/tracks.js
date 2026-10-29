@@ -3,6 +3,9 @@
 // src/assets/capas/. Não precisa editar nenhuma lista manualmente: basta
 // soltar os arquivos nessas pastas.
 //
+// Hoje as músicas do DJ ficam no catálogo online (página de admin) e esta pasta
+// está vazia: tudo que entra aqui vai dentro do APK e de cada atualização.
+//
 // Convenção de nome sugerida: "Artista - Título.mp3". Sem o " - ", o nome
 // inteiro do arquivo vira o título e o artista fica ARTISTA_PADRAO.
 //
