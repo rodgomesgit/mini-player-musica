@@ -24,7 +24,20 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # Pacote de atualização do app Android (src/lib/atualizacao.js): a parte
+      # web do app, publicada junto com o site.
+      - name: Gera o pacote de atualização do app Android
+        run: |
+          npm run build:android
+          (cd dist && zip -qr ../bundle-android.zip .)
+        env:
+          VITE_VERSAO_WEB: ${{ github.run_number }}
       - run: npm run build
+      - name: Publica o pacote junto com o site
+        run: |
+          mkdir -p dist/android
+          mv bundle-android.zip dist/android/bundle-${{ github.run_number }}.zip
+          node scripts/manifesto-atualizacao.mjs ${{ github.run_number }} > dist/android/versao.json
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

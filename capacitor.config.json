@@ -1,5 +1,12 @@
 {
   "appId": "com.rwplayer.app",
   "appName": "Rw Player",
-  "webDir": "dist"
+  "webDir": "dist",
+  "plugins": {
+    "CapacitorUpdater": {
+      "autoUpdate": false,
+      "statsUrl": "",
+      "channelUrl": ""
+    }
+  }
 }
