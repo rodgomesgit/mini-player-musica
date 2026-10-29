@@ -1,8 +1,8 @@
 import { CapaFaixa } from './CapaFaixa.jsx'
-import { IconeCoracao, IconeLixeira, IconeOndaSonora, IconePause, IconePlay } from './Icones.jsx'
+import { IconeCoracao, IconeMaisOpcoes, IconeOndaSonora, IconePause, IconePlay } from './Icones.jsx'
 import { formatarTempo } from '../lib/utils.js'
 
-export function TrackRow({ faixa, numero, ativa, tocando, duracao, favorita, onTocar, onAlternarFavorito, onRemover }) {
+export function TrackRow({ faixa, numero, ativa, tocando, duracao, favorita, onTocar, onAlternarFavorito, onOpcoes }) {
   return (
     <div
       className={`group grid grid-cols-[1fr_auto] items-center rounded-md transition-colors ${
@@ -46,7 +46,7 @@ export function TrackRow({ faixa, numero, ativa, tocando, duracao, favorita, onT
         </span>
       </button>
 
-      <span className="flex items-center pr-2">
+      <span className="flex items-center pr-1">
         <button
           type="button"
           onClick={onAlternarFavorito}
@@ -56,16 +56,14 @@ export function TrackRow({ faixa, numero, ativa, tocando, duracao, favorita, onT
         >
           <IconeCoracao preenchido={favorita} width={18} height={18} />
         </button>
-        {onRemover && (
-          <button
-            type="button"
-            onClick={onRemover}
-            aria-label={`Remover ${faixa.titulo} da playlist`}
-            className="p-2 text-neutral-500 hover:text-red-400 transition-colors"
-          >
-            <IconeLixeira width={18} height={18} />
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={onOpcoes}
+          aria-label={`Mais opções para ${faixa.titulo}`}
+          className="p-2 text-neutral-500 hover:text-white transition-colors"
+        >
+          <IconeMaisOpcoes width={18} height={18} />
+        </button>
       </span>
     </div>
   )

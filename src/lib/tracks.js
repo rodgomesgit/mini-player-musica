@@ -6,8 +6,9 @@
 // Convenção de nome sugerida: "Artista - Título.mp3". Sem o " - ", o nome
 // inteiro do arquivo vira o título e o artista fica ARTISTA_PADRAO.
 //
-// Um arquivo "padrao.jpg" (ou .jpeg/.png/.webp) em src/assets/capas/ vira a
-// capa de qualquer música que não tenha uma capa própria com o mesmo nome.
+// A capa de cada música é a imagem de álbum embutida no próprio arquivo (lida
+// em useCapasEmbutidas). Uma imagem com o mesmo nome em src/assets/capas/ tem
+// prioridade sobre ela. Sem nenhuma das duas, a música fica sem capa.
 
 const musicModules = import.meta.glob('../assets/musicas/*.{mp3,wav,ogg,m4a}', {
   eager: true,
@@ -20,25 +21,15 @@ const capaModules = import.meta.glob('../assets/capas/*.{jpg,jpeg,png,webp}', {
 })
 
 const ARTISTA_PADRAO = 'DJ RapWell'
-const NOME_CAPA_PADRAO = 'padrao'
 
 function nomeBase(caminho) {
   const arquivo = caminho.split('/').pop()
   return arquivo.replace(/\.[^.]+$/, '')
 }
 
-// Um arquivo chamado "padrao.*" em src/assets/capas/ vira a capa usada em
-// qualquer música que não tenha uma capa própria (mesmo nome do áudio).
-let capaPadrao = null
-const capasPorNomeBase = new Map()
-for (const [caminho, url] of Object.entries(capaModules)) {
-  const base = nomeBase(caminho)
-  if (base === NOME_CAPA_PADRAO) {
-    capaPadrao = url
-  } else {
-    capasPorNomeBase.set(base, url)
-  }
-}
+const capasPorNomeBase = new Map(
+  Object.entries(capaModules).map(([caminho, url]) => [nomeBase(caminho), url]),
+)
 
 function extrairTituloArtista(nome) {
   const partes = nome.split(' - ')
@@ -49,7 +40,7 @@ function extrairTituloArtista(nome) {
 }
 
 // Também usada pras músicas importadas do aparelho, que seguem a mesma
-// convenção de nome e recebem a capa padrão.
+// convenção de nome.
 export function criarFaixa({ id, nomeArquivo, src }) {
   const base = nomeBase(nomeArquivo)
   const { artista, titulo } = extrairTituloArtista(base)
@@ -58,7 +49,7 @@ export function criarFaixa({ id, nomeArquivo, src }) {
     titulo,
     artista,
     src,
-    capa: capasPorNomeBase.get(base) || capaPadrao,
+    capa: capasPorNomeBase.get(base) ?? null,
   }
 }
 

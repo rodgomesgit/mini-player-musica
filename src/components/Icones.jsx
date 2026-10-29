@@ -153,3 +153,37 @@ export function IconeLixeira(props) {
     </Svg>
   )
 }
+
+export function IconeMaisOpcoes(props) {
+  return (
+    <Svg {...props}>
+      <circle cx="5" cy="12" r="1.8" />
+      <circle cx="12" cy="12" r="1.8" />
+      <circle cx="19" cy="12" r="1.8" />
+    </Svg>
+  )
+}
+
+export function IconeCheck(props) {
+  return (
+    <Svg {...props}>
+      <path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  )
+}
+
+export function IconeRecolher(props) {
+  return (
+    <Svg {...props}>
+      <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  )
+}
+
+export function IconeAdicionarPlaylist(props) {
+  return (
+    <Svg {...props}>
+      <path d="M4 6h11M4 11h11M4 16h7m6-3v8m-4-4h8" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </Svg>
+  )
+}

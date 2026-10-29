@@ -63,3 +63,25 @@ input[type="range"].player-slider::-moz-range-thumb {
 input[type="range"].player-slider:hover::-moz-range-thumb {
   opacity: 1;
 }
+
+/* Na tela cheia o polegar fica sempre visível e maior, pro dedo. */
+input[type="range"].player-slider-grande::-webkit-slider-thumb {
+  width: 16px;
+  height: 16px;
+  opacity: 1;
+}
+input[type="range"].player-slider-grande::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  opacity: 1;
+}
+
+/* Tela "Tocando agora" sobe de baixo ao abrir. */
+@keyframes subir-tela {
+  from {
+    transform: translateY(100%);
+  }
+}
+.tela-tocando {
+  animation: subir-tela 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}

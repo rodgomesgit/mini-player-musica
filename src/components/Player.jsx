@@ -26,6 +26,7 @@ export function Player({
   onVolume,
   onAlternarEmbaralhar,
   onAlternarRepetir,
+  onAbrirTela,
 }) {
   const progressoPercentual = duracao > 0 ? (progresso / duracao) * 100 : 0
   const semFaixa = !faixaAtual
@@ -35,18 +36,24 @@ export function Player({
       {/* No celular: faixa em cima, controles embaixo; o volume fica com os
           botões físicos do aparelho. */}
       <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-[1fr_2fr_1fr] items-center gap-2 sm:gap-4">
-        {/* Faixa atual */}
-        <div className="flex items-center gap-3 min-w-0">
+        {/* Faixa atual: tocar aqui abre a tela cheia da música */}
+        <button
+          type="button"
+          onClick={onAbrirTela}
+          disabled={semFaixa}
+          aria-label={semFaixa ? undefined : `Abrir tela da música ${faixaAtual.titulo}`}
+          className="flex items-center gap-3 min-w-0 text-left rounded-md -m-1 p-1 enabled:hover:bg-white/5 transition-colors"
+        >
           <CapaFaixa capa={faixaAtual?.capa} titulo={faixaAtual?.titulo} />
-          <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-white">
+          <span className="min-w-0">
+            <span className="block truncate text-sm font-medium text-white">
               {faixaAtual?.titulo ?? 'Nada tocando'}
-            </p>
-            <p className="truncate text-xs text-neutral-400">
+            </span>
+            <span className="block truncate text-xs text-neutral-400">
               {faixaAtual?.artista ?? 'Escolha uma música na lista'}
-            </p>
-          </div>
-        </div>
+            </span>
+          </span>
+        </button>
 
         {/* Controles + barra de progresso */}
         <div className="flex flex-col items-center gap-1.5">

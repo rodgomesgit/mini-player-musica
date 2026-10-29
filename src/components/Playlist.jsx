@@ -1,8 +1,10 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
+import { Dialogo, FormNome } from './Dialogo.jsx'
+import { OpcoesFaixa } from './OpcoesFaixa.jsx'
 import { TrackRow } from './TrackRow.jsx'
 import { IconeAdicionar, IconeBusca, IconeMusica } from './Icones.jsx'
 
-const FILTROS = [
+const FILTROS_FIXOS = [
   { id: 'todas', rotulo: 'Todas' },
   { id: 'favoritas', rotulo: 'Favoritas' },
   { id: 'celular', rotulo: 'Do celular' },
@@ -10,7 +12,7 @@ const FILTROS = [
 
 export function Playlist({
   faixas,
-  totalFaixas,
+  todasFaixas,
   idAtual,
   tocando,
   duracoes,
@@ -18,14 +20,24 @@ export function Playlist({
   busca,
   filtro,
   importando,
+  playlists,
+  playlistAtiva,
   onBusca,
   onFiltro,
   onImportar,
   onTocarFaixa,
   onAlternarFavorito,
-  onRemover,
+  onRemoverDoApp,
+  onCriarPlaylist,
+  onRenomearPlaylist,
+  onExcluirPlaylist,
+  onAlternarNaPlaylist,
 }) {
   const inputArquivosRef = useRef(null)
+  // Qual painel está aberto: 'nova', 'renomear', 'excluir' ou { opcoesDe: id }.
+  const [dialogo, setDialogo] = useState(null)
+  const fecharDialogo = () => setDialogo(null)
+  const faixaDasOpcoes = dialogo?.opcoesDe ? todasFaixas.find((f) => f.id === dialogo.opcoesDe) : null
 
   function aoEscolherArquivos(ev) {
     onImportar(ev.target.files)
@@ -37,20 +49,40 @@ export function Playlist({
     <div>
       <div className="px-3 pb-3 flex items-center justify-between gap-3">
         <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-3 min-w-0">
-          <h2 className="text-2xl font-bold whitespace-nowrap">Sua playlist</h2>
+          <h2 className="text-2xl font-bold truncate">{playlistAtiva?.nome ?? 'Sua playlist'}</h2>
           <span className="text-sm text-neutral-400 whitespace-nowrap">
-            {totalFaixas} {totalFaixas === 1 ? 'música' : 'músicas'}
+            {playlistAtiva ? faixas.length : todasFaixas.length}{' '}
+            {(playlistAtiva ? faixas.length : todasFaixas.length) === 1 ? 'música' : 'músicas'}
           </span>
         </div>
-        <button
-          type="button"
-          onClick={() => inputArquivosRef.current?.click()}
-          disabled={importando}
-          className="shrink-0 flex items-center gap-1.5 rounded-full border border-white/20 px-3 py-1.5 text-sm font-medium text-white hover:border-white/60 disabled:opacity-50 transition-colors"
-        >
-          <IconeAdicionar width={16} height={16} />
-          {importando ? 'Adicionando…' : 'Adicionar músicas'}
-        </button>
+        {playlistAtiva ? (
+          <div className="shrink-0 flex gap-2">
+            <button
+              type="button"
+              onClick={() => setDialogo('renomear')}
+              className="rounded-full border border-white/20 px-3 py-1.5 text-sm font-medium text-white hover:border-white/60 transition-colors"
+            >
+              Renomear
+            </button>
+            <button
+              type="button"
+              onClick={() => setDialogo('excluir')}
+              className="rounded-full border border-white/20 px-3 py-1.5 text-sm font-medium text-red-400 hover:border-red-400 transition-colors"
+            >
+              Excluir
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => inputArquivosRef.current?.click()}
+            disabled={importando}
+            className="shrink-0 flex items-center gap-1.5 rounded-full border border-white/20 px-3 py-1.5 text-sm font-medium text-white hover:border-white/60 disabled:opacity-50 transition-colors"
+          >
+            <IconeAdicionar width={16} height={16} />
+            {importando ? 'Adicionando…' : 'Adicionar músicas'}
+          </button>
+        )}
         <input
           ref={inputArquivosRef}
           type="file"
@@ -73,25 +105,39 @@ export function Playlist({
             aria-label="Buscar na playlist"
           />
         </label>
-        <div className="flex gap-2" role="group" aria-label="Filtrar playlist">
-          {FILTROS.map(({ id, rotulo }) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => onFiltro(id)}
-              aria-pressed={filtro === id}
-              className={`rounded-full px-3 py-1 text-sm transition-colors ${
-                filtro === id ? 'bg-green-500 text-black font-medium' : 'bg-white/10 text-white hover:bg-white/20'
-              }`}
-            >
-              {rotulo}
-            </button>
-          ))}
+        <div
+          className="-mx-3 px-3 flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          role="group"
+          aria-label="Filtrar playlist"
+        >
+          {[...FILTROS_FIXOS, ...playlists.map((p) => ({ id: `playlist:${p.id}`, rotulo: p.nome }))].map(
+            ({ id, rotulo }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => onFiltro(id)}
+                aria-pressed={filtro === id}
+                className={`shrink-0 max-w-[12rem] truncate rounded-full px-3 py-1 text-sm transition-colors ${
+                  filtro === id ? 'bg-green-500 text-black font-medium' : 'bg-white/10 text-white hover:bg-white/20'
+                }`}
+              >
+                {rotulo}
+              </button>
+            ),
+          )}
+          <button
+            type="button"
+            onClick={() => setDialogo('nova')}
+            className="shrink-0 flex items-center gap-1 rounded-full border border-dashed border-white/30 px-3 py-1 text-sm text-white hover:border-white/60"
+          >
+            <IconeAdicionar width={14} height={14} />
+            Nova playlist
+          </button>
         </div>
       </div>
 
       {faixas.length === 0 ? (
-        <ListaVazia totalFaixas={totalFaixas} busca={busca} filtro={filtro} />
+        <ListaVazia totalFaixas={todasFaixas.length} busca={busca} filtro={filtro} playlistAtiva={playlistAtiva} />
       ) : (
         <div className="flex flex-col gap-0.5">
           {faixas.map((faixa, indice) => (
@@ -105,21 +151,85 @@ export function Playlist({
               favorita={favoritos.has(faixa.id)}
               onTocar={() => onTocarFaixa(faixa.id)}
               onAlternarFavorito={() => onAlternarFavorito(faixa.id)}
-              onRemover={faixa.importada ? () => onRemover(faixa.id) : undefined}
+              onOpcoes={() => setDialogo({ opcoesDe: faixa.id })}
             />
           ))}
         </div>
+      )}
+
+      {dialogo === 'nova' && (
+        <Dialogo titulo="Nova playlist" onFechar={fecharDialogo}>
+          <FormNome
+            rotuloBotao="Criar"
+            onCancelar={fecharDialogo}
+            onSalvar={(nome) => {
+              onFiltro(`playlist:${onCriarPlaylist(nome)}`)
+              fecharDialogo()
+            }}
+          />
+        </Dialogo>
+      )}
+
+      {dialogo === 'renomear' && playlistAtiva && (
+        <Dialogo titulo="Renomear playlist" onFechar={fecharDialogo}>
+          <FormNome
+            valorInicial={playlistAtiva.nome}
+            rotuloBotao="Salvar"
+            onCancelar={fecharDialogo}
+            onSalvar={(nome) => {
+              onRenomearPlaylist(playlistAtiva.id, nome)
+              fecharDialogo()
+            }}
+          />
+        </Dialogo>
+      )}
+
+      {dialogo === 'excluir' && playlistAtiva && (
+        <Dialogo titulo={`Excluir "${playlistAtiva.nome}"?`} onFechar={fecharDialogo}>
+          <p className="text-sm text-neutral-300 mb-5">
+            A playlist some, mas as músicas continuam no app.
+          </p>
+          <div className="flex justify-end gap-2">
+            <button type="button" onClick={fecharDialogo} className="rounded-full px-4 py-2 text-sm font-medium text-neutral-300 hover:text-white">
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                onExcluirPlaylist(playlistAtiva.id)
+                fecharDialogo()
+              }}
+              className="rounded-full bg-red-500 px-5 py-2 text-sm font-bold text-white hover:bg-red-400"
+            >
+              Excluir
+            </button>
+          </div>
+        </Dialogo>
+      )}
+
+      {faixaDasOpcoes && (
+        <OpcoesFaixa
+          faixa={faixaDasOpcoes}
+          playlists={playlists}
+          onAlternarNaPlaylist={onAlternarNaPlaylist}
+          onCriarPlaylist={onCriarPlaylist}
+          onRemoverDoApp={faixaDasOpcoes.importada ? () => onRemoverDoApp(faixaDasOpcoes.id) : undefined}
+          onFechar={fecharDialogo}
+        />
       )}
     </div>
   )
 }
 
-function ListaVazia({ totalFaixas, busca, filtro }) {
+function ListaVazia({ totalFaixas, busca, filtro, playlistAtiva }) {
   let titulo = 'Nenhuma música ainda'
   let texto = 'Toque em "Adicionar músicas" pra escolher arquivos de áudio do seu aparelho.'
   if (totalFaixas > 0 && busca.trim()) {
     titulo = 'Nada encontrado'
     texto = `Nenhuma música combina com "${busca.trim()}".`
+  } else if (playlistAtiva) {
+    titulo = 'Playlist vazia'
+    texto = 'Em "Todas", toque em ⋯ ao lado de uma música e escolha esta playlist.'
   } else if (filtro === 'favoritas') {
     titulo = 'Nenhuma favorita ainda'
     texto = 'Toque no coração ao lado de uma música pra favoritar.'

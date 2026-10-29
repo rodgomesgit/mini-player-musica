@@ -1,11 +1,14 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Player } from './components/Player.jsx'
 import { Playlist } from './components/Playlist.jsx'
+import { TelaTocando } from './components/TelaTocando.jsx'
 import { useAudioPlayer } from './hooks/useAudioPlayer.js'
+import { useCapasEmbutidas } from './hooks/useCapasEmbutidas.js'
 import { useDuracoesFaixas } from './hooks/useDuracoesFaixas.js'
 import { useFavoritos } from './hooks/useFavoritos.js'
 import { useMediaSession } from './hooks/useMediaSession.js'
 import { useMusicasImportadas } from './hooks/useMusicasImportadas.js'
+import { usePlaylists } from './hooks/usePlaylists.js'
 import { faixas } from './lib/tracks.js'
 
 function normalizar(texto) {
@@ -15,23 +18,56 @@ function normalizar(texto) {
 export default function App() {
   const { importadas, importando, importar, remover } = useMusicasImportadas()
   const { favoritos, alternarFavorito } = useFavoritos()
+  const { playlists, criar, renomear, excluir, alternarFaixa, removerFaixaDeTodas } = usePlaylists()
   const [busca, setBusca] = useState('')
-  const [filtro, setFiltro] = useState('todas')
+  const [filtroEscolhido, setFiltro] = useState('todas')
+  const [telaAberta, setTelaAberta] = useState(false)
 
-  const todas = useMemo(() => [...faixas, ...importadas], [importadas])
+  // A tela cheia ganha uma entrada no histórico: assim o "voltar" do Android
+  // fecha a tela em vez de sair do app.
+  useEffect(() => {
+    if (history.state?.telaTocando) history.replaceState(null, '')
+    const aoVoltar = () => setTelaAberta(history.state?.telaTocando === true)
+    window.addEventListener('popstate', aoVoltar)
+    return () => window.removeEventListener('popstate', aoVoltar)
+  }, [])
+  const abrirTela = useCallback(() => {
+    history.pushState({ telaTocando: true }, '')
+    setTelaAberta(true)
+  }, [])
+  const fecharTela = useCallback(() => {
+    if (history.state?.telaTocando) history.back()
+    else setTelaAberta(false)
+  }, [])
+
+  const arquivos = useMemo(() => [...faixas, ...importadas], [importadas])
+  const capasEmbutidas = useCapasEmbutidas(arquivos)
+  const todas = useMemo(
+    () => arquivos.map((faixa) => (faixa.capa || !capasEmbutidas[faixa.id] ? faixa : { ...faixa, capa: capasEmbutidas[faixa.id] })),
+    [arquivos, capasEmbutidas],
+  )
+
+  // Se a playlist aberta for excluída, volta pra lista com todas.
+  const playlistAtiva = filtroEscolhido.startsWith('playlist:')
+    ? playlists.find((p) => `playlist:${p.id}` === filtroEscolhido) ?? null
+    : null
+  const filtro = filtroEscolhido.startsWith('playlist:') && !playlistAtiva ? 'todas' : filtroEscolhido
 
   const visiveis = useMemo(() => {
     const termo = normalizar(busca.trim())
-    return todas.filter((faixa) => {
+    const base = playlistAtiva
+      ? playlistAtiva.faixas.map((id) => todas.find((f) => f.id === id)).filter(Boolean)
+      : todas
+    return base.filter((faixa) => {
       if (filtro === 'favoritas' && !favoritos.has(faixa.id)) return false
       if (filtro === 'celular' && !faixa.importada) return false
       if (!termo) return true
       return normalizar(`${faixa.titulo} ${faixa.artista}`).includes(termo)
     })
-  }, [todas, busca, filtro, favoritos])
+  }, [todas, busca, filtro, favoritos, playlistAtiva])
 
   const player = useAudioPlayer(visiveis, todas)
-  const duracoes = useDuracoesFaixas(todas)
+  const duracoes = useDuracoesFaixas(arquivos)
 
   const { tocar, pausar, proxima, anterior, buscar } = player
   const acoesMidia = useMemo(
@@ -54,9 +90,9 @@ export default function App() {
     acoes: acoesMidia,
   })
 
-  async function aoImportar(arquivos) {
+  async function aoImportar(selecionados) {
     try {
-      const quantidade = await importar(arquivos)
+      const quantidade = await importar(selecionados)
       if (quantidade > 0) setFiltro('celular')
     } catch {
       alert('Não foi possível adicionar as músicas. Verifique se há espaço livre no aparelho.')
@@ -72,7 +108,7 @@ export default function App() {
       <main className="px-4 sm:px-6 max-w-5xl mx-auto pb-36">
         <Playlist
           faixas={visiveis}
-          totalFaixas={todas.length}
+          todasFaixas={todas}
           idAtual={player.idAtual}
           tocando={player.tocando}
           duracoes={duracoes}
@@ -80,12 +116,21 @@ export default function App() {
           busca={busca}
           filtro={filtro}
           importando={importando}
+          playlists={playlists}
+          playlistAtiva={playlistAtiva}
           onBusca={setBusca}
           onFiltro={setFiltro}
           onImportar={aoImportar}
           onTocarFaixa={player.tocarFaixa}
           onAlternarFavorito={alternarFavorito}
-          onRemover={remover}
+          onRemoverDoApp={(id) => {
+            remover(id)
+            removerFaixaDeTodas(id)
+          }}
+          onCriarPlaylist={criar}
+          onRenomearPlaylist={renomear}
+          onExcluirPlaylist={excluir}
+          onAlternarNaPlaylist={alternarFaixa}
         />
       </main>
 
@@ -104,7 +149,31 @@ export default function App() {
         onVolume={player.setVolume}
         onAlternarEmbaralhar={() => player.setEmbaralhar((v) => !v)}
         onAlternarRepetir={() => player.setRepetir((v) => !v)}
+        onAbrirTela={abrirTela}
       />
+
+      {telaAberta && (
+        <TelaTocando
+          faixaAtual={player.faixaAtual}
+          tocando={player.tocando}
+          progresso={player.progresso}
+          duracao={player.duracao}
+          embaralhar={player.embaralhar}
+          repetir={player.repetir}
+          favorita={player.faixaAtual ? favoritos.has(player.faixaAtual.id) : false}
+          playlists={playlists}
+          onFechar={fecharTela}
+          onAlternarPlayPause={player.alternarPlayPause}
+          onProxima={player.proxima}
+          onAnterior={player.anterior}
+          onBuscar={player.buscar}
+          onAlternarEmbaralhar={() => player.setEmbaralhar((v) => !v)}
+          onAlternarRepetir={() => player.setRepetir((v) => !v)}
+          onAlternarFavorito={() => alternarFavorito(player.faixaAtual.id)}
+          onAlternarNaPlaylist={alternarFaixa}
+          onCriarPlaylist={criar}
+        />
+      )}
     </div>
   )
 }
