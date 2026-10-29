@@ -6,6 +6,7 @@ import { IconeAdicionar, IconeBusca, IconeMusica } from './Icones.jsx'
 
 const FILTROS_FIXOS = [
   { id: 'todas', rotulo: 'Todas' },
+  { id: 'online', rotulo: 'Online' },
   { id: 'favoritas', rotulo: 'Favoritas' },
   { id: 'celular', rotulo: 'Do celular' },
 ]
@@ -22,6 +23,7 @@ export function Playlist({
   importando,
   playlists,
   playlistAtiva,
+  temOnline,
   onBusca,
   onFiltro,
   onImportar,
@@ -110,7 +112,7 @@ export function Playlist({
           role="group"
           aria-label="Filtrar playlist"
         >
-          {[...FILTROS_FIXOS, ...playlists.map((p) => ({ id: `playlist:${p.id}`, rotulo: p.nome }))].map(
+          {[...FILTROS_FIXOS.filter((f) => f.id !== 'online' || temOnline), ...playlists.map((p) => ({ id: `playlist:${p.id}`, rotulo: p.nome }))].map(
             ({ id, rotulo }) => (
               <button
                 key={id}

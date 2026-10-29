@@ -28,9 +28,16 @@ function capaComoDataUrl(url) {
           const w = img.width * escala
           const h = img.height * escala
           canvas.getContext('2d').drawImage(img, (lado - w) / 2, (lado - h) / 2, w, h)
-          resolve(canvas.toDataURL('image/jpeg', 0.85))
+          try {
+            resolve(canvas.toDataURL('image/jpeg', 0.85))
+          } catch {
+            resolve(null)
+          }
         }
         img.onerror = () => resolve(null)
+        // Capas do catálogo online vêm de outro domínio; sem isso o canvas
+        // fica "contaminado" e não exporta a imagem.
+        img.crossOrigin = 'anonymous'
         img.src = url
       }),
     )

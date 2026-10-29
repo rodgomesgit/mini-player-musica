@@ -4,6 +4,7 @@ import { Playlist } from './components/Playlist.jsx'
 import { TelaTocando } from './components/TelaTocando.jsx'
 import { useAudioPlayer } from './hooks/useAudioPlayer.js'
 import { useCapasEmbutidas } from './hooks/useCapasEmbutidas.js'
+import { useCatalogoOnline } from './hooks/useCatalogoOnline.js'
 import { useDuracoesFaixas } from './hooks/useDuracoesFaixas.js'
 import { useFavoritos } from './hooks/useFavoritos.js'
 import { useMediaSession } from './hooks/useMediaSession.js'
@@ -17,6 +18,7 @@ function normalizar(texto) {
 
 export default function App() {
   const { importadas, importando, importar, remover } = useMusicasImportadas()
+  const online = useCatalogoOnline()
   const { favoritos, alternarFavorito } = useFavoritos()
   const { playlists, criar, renomear, excluir, alternarFaixa, removerFaixaDeTodas } = usePlaylists()
   const [busca, setBusca] = useState('')
@@ -40,11 +42,17 @@ export default function App() {
     else setTelaAberta(false)
   }, [])
 
-  const arquivos = useMemo(() => [...faixas, ...importadas], [importadas])
-  const capasEmbutidas = useCapasEmbutidas(arquivos)
+  // As do catálogo online já vêm com capa e duração do banco; só as locais
+  // precisam ser lidas do arquivo.
+  const locais = useMemo(() => [...faixas, ...importadas], [importadas])
+  const capasEmbutidas = useCapasEmbutidas(locais)
   const todas = useMemo(
-    () => arquivos.map((faixa) => (faixa.capa || !capasEmbutidas[faixa.id] ? faixa : { ...faixa, capa: capasEmbutidas[faixa.id] })),
-    [arquivos, capasEmbutidas],
+    () => [
+      ...faixas,
+      ...online,
+      ...importadas,
+    ].map((faixa) => (faixa.capa || !capasEmbutidas[faixa.id] ? faixa : { ...faixa, capa: capasEmbutidas[faixa.id] })),
+    [online, importadas, capasEmbutidas],
   )
 
   // Se a playlist aberta for excluída, volta pra lista com todas.
@@ -61,13 +69,18 @@ export default function App() {
     return base.filter((faixa) => {
       if (filtro === 'favoritas' && !favoritos.has(faixa.id)) return false
       if (filtro === 'celular' && !faixa.importada) return false
+      if (filtro === 'online' && !faixa.online) return false
       if (!termo) return true
       return normalizar(`${faixa.titulo} ${faixa.artista}`).includes(termo)
     })
   }, [todas, busca, filtro, favoritos, playlistAtiva])
 
   const player = useAudioPlayer(visiveis, todas)
-  const duracoes = useDuracoesFaixas(arquivos)
+  const duracoesLocais = useDuracoesFaixas(locais)
+  const duracoes = useMemo(() => {
+    const doBanco = Object.fromEntries(online.filter((f) => f.duracao).map((f) => [f.id, f.duracao]))
+    return { ...doBanco, ...duracoesLocais }
+  }, [online, duracoesLocais])
 
   const { tocar, pausar, proxima, anterior, buscar } = player
   const acoesMidia = useMemo(
@@ -118,6 +131,7 @@ export default function App() {
           importando={importando}
           playlists={playlists}
           playlistAtiva={playlistAtiva}
+          temOnline={online.length > 0}
           onBusca={setBusca}
           onFiltro={setFiltro}
           onImportar={aoImportar}
