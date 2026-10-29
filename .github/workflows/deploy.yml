@@ -37,7 +37,7 @@ jobs:
         run: |
           mkdir -p dist/android
           mv bundle-android.zip dist/android/bundle-${{ github.run_number }}.zip
-          node scripts/manifesto-atualizacao.mjs ${{ github.run_number }} > dist/android/versao.json
+          node scripts/manifesto-atualizacao.mjs ${{ github.run_number }} dist/android/bundle-${{ github.run_number }}.zip > dist/android/versao.json
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

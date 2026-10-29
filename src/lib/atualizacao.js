@@ -48,7 +48,7 @@ export async function verificarAtualizacao() {
   try {
     const resposta = await fetch(URL_VERSAO, { cache: 'no-store' })
     if (!resposta.ok) throw new Error(`versao.json respondeu ${resposta.status}`)
-    const { versao, url, nativoMinimo } = await resposta.json()
+    const { versao, url, checksum, nativoMinimo } = await resposta.json()
     if (!(versao > VERSAO_WEB)) {
       definirEstado('App atualizado')
       return
@@ -71,7 +71,8 @@ export async function verificarAtualizacao() {
     }
     if (!pacote) {
       definirEstado(`Baixando a versão ${versao}…`)
-      pacote = await CapacitorUpdater.download({ url, version: String(versao) })
+      // Sem o checksum (SHA-256 do zip) o plugin recusa o pacote.
+      pacote = await CapacitorUpdater.download({ url, version: String(versao), checksum })
     }
     await CapacitorUpdater.next({ id: pacote.id })
     definirEstado(`Versão ${versao} pronta: feche e abra o app`)
