@@ -16,7 +16,7 @@ export function BoasVindas({ onBuscar, onEntrar }) {
       role="dialog"
       aria-modal="true"
       aria-labelledby="boas-vindas-titulo"
-      className="boas-vindas fixed inset-0 z-50 overflow-x-hidden overflow-y-auto bg-neutral-950"
+      className="boas-vindas fixed inset-0 z-50 overflow-x-hidden overflow-y-auto bg-noite"
     >
       {/* Brilhos de fundo nas cores do mascote. */}
       <div className="pointer-events-none absolute -top-24 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-orange-500/25 blur-3xl" />
@@ -30,9 +30,9 @@ export function BoasVindas({ onBuscar, onEntrar }) {
           className="mascote-flutuando w-64 max-w-[70vw] max-h-[42vh] object-contain drop-shadow-[0_12px_30px_rgba(249,115,22,0.35)]"
         />
 
-        <h1 id="boas-vindas-titulo" className="mt-6 text-3xl font-extrabold leading-tight tracking-tight text-white">
+        <h1 id="boas-vindas-titulo" className="mt-6 font-display text-[2rem] font-extrabold leading-tight tracking-tight text-white">
           Seja bem-vindo à festa do{' '}
-          <span className="bg-gradient-to-r from-orange-400 via-amber-300 to-fuchsia-400 bg-clip-text text-transparent">
+          <span className="texto-festa">
             DJ Rw
           </span>
           !
@@ -40,7 +40,7 @@ export function BoasVindas({ onBuscar, onEntrar }) {
         <p className="mt-3 text-lg text-neutral-300">Qual música você tá a fim de ouvir hoje?</p>
 
         <form onSubmit={aoEnviar} className="mt-6 w-full flex gap-2">
-          <label className="flex-1 min-w-0 flex items-center gap-2 rounded-full bg-white/10 px-4 py-3 focus-within:ring-2 focus-within:ring-orange-400/70">
+          <label className="flex-1 min-w-0 flex items-center gap-2 rounded-full bg-white/10 px-4 py-3 focus-within:ring-2 focus-within:ring-coral/70">
             <IconeBusca width={18} height={18} className="text-neutral-400 shrink-0" />
             <input
               name="termo"
@@ -53,7 +53,7 @@ export function BoasVindas({ onBuscar, onEntrar }) {
           </label>
           <button
             type="submit"
-            className="shrink-0 rounded-full bg-green-500 px-5 font-bold text-black hover:bg-green-400 transition-colors"
+            className="shrink-0 rounded-full bg-festa brilho-festa px-5 font-bold text-white hover:brightness-110 transition"
           >
             Bora!
           </button>

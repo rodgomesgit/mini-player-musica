@@ -91,7 +91,7 @@ export function TelaTocando({
       onTouchMove={aoMoverToque}
       onTouchEnd={aoSoltarToque}
       style={arrasto ? { transform: `translateY(${arrasto}px)`, transition: 'none' } : undefined}
-      className="tela-tocando fixed inset-0 z-40 overflow-hidden bg-neutral-950 transition-transform duration-200"
+      className="tela-tocando fixed inset-0 z-40 overflow-hidden bg-noite transition-transform duration-200"
     >
       {/* Fundo: a própria capa, ampliada e borrada. */}
       {faixaAtual.capa && (
@@ -102,7 +102,8 @@ export function TelaTocando({
           className="absolute inset-0 h-full w-full object-cover scale-125 blur-3xl opacity-60"
         />
       )}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/50 to-black/90" />
+      <div className="absolute inset-0 bg-gradient-to-b from-noite/20 via-noite/55 to-noite/95" />
+      <div className="pointer-events-none absolute -bottom-32 left-1/2 h-80 w-[36rem] -translate-x-1/2 rounded-full bg-rosa/20 blur-3xl" />
 
       <div className="relative h-full max-w-md mx-auto flex flex-col px-6 pt-[calc(0.75rem+env(safe-area-inset-top))] pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
         <div className="flex items-center justify-between">
@@ -129,7 +130,7 @@ export function TelaTocando({
           <CapaFaixa
             capa={faixaAtual.capa}
             titulo={faixaAtual.titulo}
-            tamanho="w-full max-w-[22rem] aspect-square shadow-2xl shadow-black/60 [&>svg]:w-1/4 [&>svg]:h-1/4"
+            tamanho="w-full max-w-[22rem] aspect-square rounded-3xl shadow-2xl shadow-black/60 ring-1 ring-white/10 [&>svg]:w-1/4 [&>svg]:h-1/4"
           />
         </div>
 
@@ -143,7 +144,7 @@ export function TelaTocando({
             <IconeAdicionarPlaylist width={24} height={24} />
           </button>
           <div className="flex-1 min-w-0 text-center">
-            <p className="truncate text-xl font-bold text-white">{faixaAtual.titulo}</p>
+            <p className="font-display truncate text-2xl font-bold tracking-tight text-white">{faixaAtual.titulo}</p>
             <p className="truncate text-sm text-white/70">{faixaAtual.artista}</p>
           </div>
           <button
@@ -151,7 +152,7 @@ export function TelaTocando({
             onClick={onAlternarFavorito}
             aria-pressed={favorita}
             aria-label={favorita ? 'Remover dos favoritos' : 'Favoritar'}
-            className={`-mr-2 p-2 transition-colors ${favorita ? 'text-green-500' : 'text-white/80 hover:text-white'}`}
+            className={`-mr-2 p-2 transition-colors ${favorita ? 'text-rosa' : 'text-white/80 hover:text-white'}`}
           >
             <IconeCoracao preenchido={favorita} width={24} height={24} />
           </button>
@@ -181,7 +182,7 @@ export function TelaTocando({
             onClick={onAlternarRepetir}
             aria-pressed={repetir}
             aria-label="Repetir"
-            className={`p-2 transition-colors ${repetir ? 'text-green-500' : 'text-white/70 hover:text-white'}`}
+            className={`p-2 transition-colors ${repetir ? 'text-coral' : 'text-white/70 hover:text-white'}`}
           >
             <IconeRepetir width={22} height={22} />
           </button>
@@ -192,7 +193,7 @@ export function TelaTocando({
             type="button"
             onClick={onAlternarPlayPause}
             aria-label={tocando ? 'Pausar' : 'Tocar'}
-            className="w-16 h-16 flex items-center justify-center rounded-full bg-white text-black hover:scale-105 transition-transform"
+            className="w-[4.5rem] h-[4.5rem] flex items-center justify-center rounded-full bg-festa brilho-festa text-white hover:scale-105 transition-transform"
           >
             {tocando ? <IconePause width={30} height={30} /> : <IconePlay width={30} height={30} />}
           </button>
@@ -204,7 +205,7 @@ export function TelaTocando({
             onClick={onAlternarEmbaralhar}
             aria-pressed={embaralhar}
             aria-label="Embaralhar"
-            className={`p-2 transition-colors ${embaralhar ? 'text-green-500' : 'text-white/70 hover:text-white'}`}
+            className={`p-2 transition-colors ${embaralhar ? 'text-coral' : 'text-white/70 hover:text-white'}`}
           >
             <IconeEmbaralhar width={22} height={22} />
           </button>

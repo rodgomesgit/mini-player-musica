@@ -14,6 +14,7 @@ import { useMusicasImportadas } from './hooks/useMusicasImportadas.js'
 import { usePlaylists } from './hooks/usePlaylists.js'
 import { lerEstadoAtualizacao, ouvirEstadoAtualizacao, VERSAO_WEB } from './lib/atualizacao.js'
 import { faixas } from './lib/tracks.js'
+import avatar from './assets/dj-rw-avatar.webp'
 
 function normalizar(texto) {
   return texto.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
@@ -168,12 +169,28 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-neutral-900 to-neutral-950">
-      <header className="px-6 pt-[calc(2rem+env(safe-area-inset-top))] pb-4">
-        <h1 className="text-3xl font-bold tracking-tight">🎵 Rw Player</h1>
+    <div className="relative min-h-screen bg-noite">
+      {/* Luzes de festa bem suaves atrás de tudo. */}
+      <div aria-hidden="true" className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-32 h-[28rem] w-[28rem] rounded-full bg-coral/20 blur-3xl" />
+        <div className="absolute top-1/3 -left-40 h-[26rem] w-[26rem] rounded-full bg-violeta/15 blur-3xl" />
+      </div>
+
+      <header className="relative px-4 sm:px-6 max-w-5xl mx-auto pt-[calc(1.75rem+env(safe-area-inset-top))] pb-5 flex items-center gap-3">
+        <img
+          src={avatar}
+          alt=""
+          className="h-14 w-14 shrink-0 object-contain drop-shadow-[0_6px_16px_rgba(255,111,94,0.45)]"
+        />
+        <div className="min-w-0">
+          <h1 className="font-display text-[1.7rem] font-extrabold leading-none tracking-tight">
+            <span className="texto-festa">Rw</span> Player
+          </h1>
+          <p className="mt-1 text-xs font-medium uppercase tracking-[0.2em] text-white/45">A festa do DJ Rw</p>
+        </div>
       </header>
 
-      <main className="px-4 sm:px-6 max-w-5xl mx-auto pb-36">
+      <main className="relative px-4 sm:px-6 max-w-5xl mx-auto pb-44">
         <Playlist
           faixas={visiveis}
           todasFaixas={todas}
@@ -204,7 +221,7 @@ export default function App() {
           onAlternarNaPlaylist={alternarFaixa}
         />
         {estadoAtualizacao && (
-          <p className="pt-6 text-center text-xs text-neutral-600">
+          <p className="pt-6 text-center text-xs text-white/30">
             Versão {VERSAO_WEB || 'do APK'} · {estadoAtualizacao}
           </p>
         )}

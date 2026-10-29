@@ -32,24 +32,25 @@ export function Player({
   const semFaixa = !faixaAtual
 
   return (
-    <footer className="fixed bottom-0 inset-x-0 border-t border-white/10 bg-neutral-950/95 backdrop-blur px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+    <footer className="fixed bottom-0 inset-x-0 px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pointer-events-none">
+      <div className="pointer-events-auto max-w-5xl mx-auto rounded-3xl bg-noite-alta/85 backdrop-blur-xl ring-1 ring-white/10 shadow-2xl shadow-black/60 px-4 pt-3 pb-3">
       {/* No celular: faixa em cima, controles embaixo; o volume fica com os
           botões físicos do aparelho. */}
-      <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-[1fr_2fr_1fr] items-center gap-2 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-[1fr_2fr_1fr] items-center gap-2 sm:gap-4">
         {/* Faixa atual: tocar aqui abre a tela cheia da música */}
         <button
           type="button"
           onClick={onAbrirTela}
           disabled={semFaixa}
           aria-label={semFaixa ? undefined : `Abrir tela da música ${faixaAtual.titulo}`}
-          className="flex items-center gap-3 min-w-0 text-left rounded-md -m-1 p-1 enabled:hover:bg-white/5 transition-colors"
+          className="flex items-center gap-3 min-w-0 text-left rounded-xl -m-1 p-1 enabled:hover:bg-white/5 transition-colors"
         >
           <CapaFaixa capa={faixaAtual?.capa} titulo={faixaAtual?.titulo} />
           <span className="min-w-0">
             <span className="block truncate text-sm font-medium text-white">
               {faixaAtual?.titulo ?? 'Nada tocando'}
             </span>
-            <span className="block truncate text-xs text-neutral-400">
+            <span className="block truncate text-xs text-white/55">
               {faixaAtual?.artista ?? 'Escolha uma música na lista'}
             </span>
           </span>
@@ -64,7 +65,7 @@ export function Player({
               disabled={semFaixa}
               aria-pressed={embaralhar}
               aria-label="Embaralhar"
-              className={`transition-colors disabled:opacity-30 ${embaralhar ? 'text-green-500' : 'text-neutral-400 hover:text-white'}`}
+              className={`transition-colors disabled:opacity-30 ${embaralhar ? 'text-coral' : 'text-white/50 hover:text-white'}`}
             >
               <IconeEmbaralhar width={16} height={16} />
             </button>
@@ -73,7 +74,7 @@ export function Player({
               onClick={onAnterior}
               disabled={semFaixa}
               aria-label="Faixa anterior"
-              className="text-neutral-200 hover:text-white disabled:opacity-30"
+              className="text-white/85 hover:text-white disabled:opacity-30"
             >
               <IconeAnterior width={20} height={20} />
             </button>
@@ -82,7 +83,7 @@ export function Player({
               onClick={onAlternarPlayPause}
               disabled={semFaixa}
               aria-label={tocando ? 'Pausar' : 'Tocar'}
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-black disabled:opacity-30 hover:scale-105 transition-transform"
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-festa brilho-festa text-white disabled:opacity-30 disabled:shadow-none hover:scale-105 transition-transform"
             >
               {tocando ? <IconePause width={18} height={18} /> : <IconePlay width={18} height={18} />}
             </button>
@@ -91,7 +92,7 @@ export function Player({
               onClick={onProxima}
               disabled={semFaixa}
               aria-label="Próxima faixa"
-              className="text-neutral-200 hover:text-white disabled:opacity-30"
+              className="text-white/85 hover:text-white disabled:opacity-30"
             >
               <IconeProxima width={20} height={20} />
             </button>
@@ -101,14 +102,14 @@ export function Player({
               disabled={semFaixa}
               aria-pressed={repetir}
               aria-label="Repetir"
-              className={`transition-colors disabled:opacity-30 ${repetir ? 'text-green-500' : 'text-neutral-400 hover:text-white'}`}
+              className={`transition-colors disabled:opacity-30 ${repetir ? 'text-coral' : 'text-white/50 hover:text-white'}`}
             >
               <IconeRepetir width={16} height={16} />
             </button>
           </div>
 
           <div className="w-full flex items-center gap-2">
-            <span className="text-xs text-neutral-400 tabular-nums w-9 text-right">
+            <span className="text-xs text-white/50 tabular-nums w-9 text-right">
               {formatarTempo(progresso)}
             </span>
             <input
@@ -123,7 +124,7 @@ export function Player({
               onChange={(ev) => onBuscar(Number(ev.target.value))}
               aria-label="Progresso da música"
             />
-            <span className="text-xs text-neutral-400 tabular-nums w-9">
+            <span className="text-xs text-white/50 tabular-nums w-9">
               {formatarTempo(duracao)}
             </span>
           </div>
@@ -148,6 +149,7 @@ export function Player({
             aria-label="Volume"
           />
         </div>
+      </div>
       </div>
     </footer>
   )

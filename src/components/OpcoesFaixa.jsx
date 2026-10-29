@@ -39,7 +39,7 @@ export function OpcoesFaixa({ faixa, playlists, onAlternarNaPlaylist, onCriarPla
               <span className="truncate text-white">{playlist.nome}</span>
               <span
                 className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border ${
-                  esta ? 'border-green-500 bg-green-500 text-black' : 'border-neutral-500 text-transparent'
+                  esta ? 'border-transparent bg-festa text-white' : 'border-white/30 text-transparent'
                 }`}
               >
                 <IconeCheck width={16} height={16} />
@@ -66,7 +66,7 @@ export function OpcoesFaixa({ faixa, playlists, onAlternarNaPlaylist, onCriarPla
               onRemoverDoApp()
               onFechar()
             }}
-            className="w-full flex items-center gap-3 rounded-lg px-3 py-3 text-left text-red-400 hover:bg-white/5"
+            className="w-full flex items-center gap-3 rounded-lg px-3 py-3 text-left text-rosa hover:bg-white/5"
           >
             <IconeLixeira width={18} height={18} />
             Remover música do app

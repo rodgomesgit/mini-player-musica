@@ -1,13 +1,43 @@
 @import "tailwindcss";
 
+/* Identidade "festa sofisticada": noite arroxeada de fundo e um degradê de
+   pôr do sol (âmbar → coral → rosa → violeta) tirado do mascote do DJ Rw. */
+@theme {
+  --color-noite: #0e0a16;
+  --color-noite-alta: #1a1326;
+  --color-coral: #ff6f5e;
+  --color-rosa: #ff4f8b;
+  --color-ambar: #ffb35c;
+  --color-violeta: #a970ff;
+  --font-display: "Bricolage Grotesque Variable", "Inter Variable", system-ui, sans-serif;
+}
+
+@utility bg-festa {
+  background-image: linear-gradient(135deg, #ffb35c 0%, #ff6f5e 40%, #ff4f8b 72%, #a970ff 100%);
+}
+
+@utility texto-festa {
+  background-image: linear-gradient(100deg, #ffb35c 0%, #ff6f5e 35%, #ff4f8b 65%, #a970ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Brilho suave em volta do botão principal. */
+@utility brilho-festa {
+  box-shadow:
+    0 8px 24px -6px rgb(255 79 139 / 0.55),
+    0 2px 8px -2px rgb(255 111 94 / 0.5);
+}
+
 :root {
   color-scheme: dark;
 }
 
 body {
   margin: 0;
-  background-color: #0a0a0a;
-  color: #f2f2f2;
+  background-color: var(--color-noite);
+  color: #f5f1fa;
   font-family: "Inter Variable", system-ui, -apple-system, sans-serif;
 }
 
@@ -18,24 +48,22 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2a2a2a;
+  background: #2c2338;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3a3a3a;
+  background: #3d3150;
 }
 
-/* Slider de progresso/volume com trilha e polegar customizados */
+/* Slider de progresso/volume: a parte já tocada leva o degradê da festa. */
 input[type="range"].player-slider {
   -webkit-appearance: none;
   appearance: none;
   height: 4px;
   border-radius: 9999px;
-  background: linear-gradient(
-    to right,
-    #1db954 var(--progresso, 0%),
-    #4d4d4d var(--progresso, 0%)
-  );
+  background:
+    linear-gradient(90deg, #ffb35c, #ff6f5e, #ff4f8b) 0 0 / var(--progresso, 0%) 100% no-repeat,
+    rgb(255 255 255 / 0.14);
   cursor: pointer;
 }
 input[type="range"].player-slider::-webkit-slider-thumb {
@@ -69,6 +97,7 @@ input[type="range"].player-slider-grande::-webkit-slider-thumb {
   width: 16px;
   height: 16px;
   opacity: 1;
+  box-shadow: 0 0 0 4px rgb(255 79 139 / 0.25);
 }
 input[type="range"].player-slider-grande::-moz-range-thumb {
   width: 16px;

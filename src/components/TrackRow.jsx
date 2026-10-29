@@ -5,8 +5,8 @@ import { formatarTempo } from '../lib/utils.js'
 export function TrackRow({ faixa, numero, ativa, tocando, duracao, favorita, onTocar, onAlternarFavorito, onOpcoes }) {
   return (
     <div
-      className={`group grid grid-cols-[1fr_auto] items-center rounded-md transition-colors ${
-        ativa ? 'bg-white/10' : 'hover:bg-white/5'
+      className={`group grid grid-cols-[1fr_auto] items-center rounded-xl transition-colors ${
+        ativa ? 'bg-white/[0.07] ring-1 ring-white/10' : 'hover:bg-white/[0.04]'
       }`}
     >
       <button
@@ -16,9 +16,9 @@ export function TrackRow({ faixa, numero, ativa, tocando, duracao, favorita, onT
       >
         <span className="text-sm text-neutral-400 flex items-center justify-center">
           {ativa && tocando ? (
-            <IconeOndaSonora className="text-green-500" width={16} height={16} />
+            <IconeOndaSonora className="text-coral" width={16} height={16} />
           ) : ativa ? (
-            <IconePause className="text-green-500" width={14} height={14} />
+            <IconePause className="text-coral" width={14} height={14} />
           ) : (
             <>
               <span className="group-hover:hidden">{numero}</span>
@@ -31,7 +31,7 @@ export function TrackRow({ faixa, numero, ativa, tocando, duracao, favorita, onT
 
         <span className="min-w-0">
           <span
-            className={`block truncate text-sm font-medium ${ativa ? 'text-green-500' : 'text-white'}`}
+            className={`block truncate text-sm font-medium ${ativa ? 'texto-festa' : 'text-white'}`}
           >
             {faixa.titulo}
           </span>
@@ -52,7 +52,7 @@ export function TrackRow({ faixa, numero, ativa, tocando, duracao, favorita, onT
           onClick={onAlternarFavorito}
           aria-pressed={favorita}
           aria-label={favorita ? `Remover ${faixa.titulo} dos favoritos` : `Favoritar ${faixa.titulo}`}
-          className={`p-2 transition-colors ${favorita ? 'text-green-500' : 'text-neutral-500 hover:text-white'}`}
+          className={`p-2 transition-colors ${favorita ? 'text-rosa' : 'text-white/35 hover:text-white'}`}
         >
           <IconeCoracao preenchido={favorita} width={18} height={18} />
         </button>
@@ -60,7 +60,7 @@ export function TrackRow({ faixa, numero, ativa, tocando, duracao, favorita, onT
           type="button"
           onClick={onOpcoes}
           aria-label={`Mais opções para ${faixa.titulo}`}
-          className="p-2 text-neutral-500 hover:text-white transition-colors"
+          className="p-2 text-white/35 hover:text-white transition-colors"
         >
           <IconeMaisOpcoes width={18} height={18} />
         </button>

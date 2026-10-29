@@ -35,7 +35,7 @@ export function Admin() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-neutral-900 to-neutral-950">
+    <div className="min-h-screen bg-noite">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-[calc(2rem+env(safe-area-inset-top))] pb-16">
         <header className="mb-8 flex items-center justify-between gap-3">
           <h1 className="text-3xl font-bold tracking-tight">🎵 Rw Player · Admin</h1>
@@ -101,7 +101,7 @@ function Login() {
       <button
         type="submit"
         disabled={entrando}
-        className="rounded-full bg-green-500 px-5 py-2.5 font-bold text-black hover:bg-green-400 disabled:opacity-50"
+        className="rounded-full bg-festa px-5 py-2.5 font-bold text-white hover:brightness-110 disabled:opacity-50"
       >
         {entrando ? 'Entrando…' : 'Entrar'}
       </button>
@@ -303,7 +303,7 @@ function Painel({ email }) {
               type="button"
               onClick={enviarTodas}
               disabled={enviando || pendentes.length === 0}
-              className="mt-2 self-end rounded-full bg-green-500 px-5 py-2.5 font-bold text-black hover:bg-green-400 disabled:opacity-50"
+              className="mt-2 self-end rounded-full bg-festa px-5 py-2.5 font-bold text-white hover:brightness-110 disabled:opacity-50"
             >
               {enviando ? 'Enviando…' : `Enviar ${pendentes.length} ${pendentes.length === 1 ? 'música' : 'músicas'}`}
             </button>

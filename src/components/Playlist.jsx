@@ -56,7 +56,7 @@ export function Playlist({
     <div>
       <div className="px-3 pb-3 flex items-center justify-between gap-3">
         <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-3 min-w-0">
-          <h2 className="text-2xl font-bold truncate">
+          <h2 className="font-display text-2xl font-bold tracking-tight truncate">
             {playlistAtiva?.nome ?? (explorando ? 'Explorar' : 'Sua playlist')}
           </h2>
           <span className="text-sm text-neutral-400 whitespace-nowrap">
@@ -89,7 +89,7 @@ export function Playlist({
             type="button"
             onClick={() => inputArquivosRef.current?.click()}
             disabled={importando}
-            className="shrink-0 flex items-center gap-1.5 rounded-full border border-white/20 px-3 py-1.5 text-sm font-medium text-white hover:border-white/60 disabled:opacity-50 transition-colors"
+            className="shrink-0 flex items-center gap-1.5 rounded-full bg-white/[0.06] ring-1 ring-white/15 px-3.5 py-1.5 text-sm font-medium text-white hover:ring-coral/70 disabled:opacity-50 transition"
           >
             <IconeAdicionar width={16} height={16} />
             {importando ? 'Adicionando…' : 'Adicionar músicas'}
@@ -106,7 +106,7 @@ export function Playlist({
       </div>
 
       <div className="px-3 pb-3 flex flex-col gap-3">
-        <label className="flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 focus-within:ring-2 focus-within:ring-white/40">
+        <label className="flex items-center gap-2 rounded-2xl bg-white/[0.06] ring-1 ring-white/10 px-4 py-2.5 focus-within:ring-2 focus-within:ring-coral/60">
           <IconeBusca width={16} height={16} className="text-neutral-400 shrink-0" />
           <input
             type="search"
@@ -129,8 +129,8 @@ export function Playlist({
                 type="button"
                 onClick={() => onFiltro(id)}
                 aria-pressed={filtro === id}
-                className={`shrink-0 max-w-[12rem] truncate rounded-full px-3 py-1 text-sm transition-colors ${
-                  filtro === id ? 'bg-green-500 text-black font-medium' : 'bg-white/10 text-white hover:bg-white/20'
+                className={`shrink-0 max-w-[12rem] truncate rounded-full px-3.5 py-1.5 text-sm transition-colors ${
+                  filtro === id ? 'bg-festa text-white font-semibold shadow-md shadow-rosa/30' : 'bg-white/[0.06] text-white/85 ring-1 ring-white/10 hover:bg-white/10'
                 }`}
               >
                 {rotulo}
@@ -140,7 +140,7 @@ export function Playlist({
           <button
             type="button"
             onClick={() => setDialogo('nova')}
-            className="shrink-0 flex items-center gap-1 rounded-full border border-dashed border-white/30 px-3 py-1 text-sm text-white hover:border-white/60"
+            className="shrink-0 flex items-center gap-1 rounded-full border border-dashed border-white/25 px-3.5 py-1.5 text-sm text-white/85 hover:border-coral hover:text-white"
           >
             <IconeAdicionar width={14} height={14} />
             Nova playlist
@@ -227,7 +227,7 @@ export function Playlist({
                 onExcluirPlaylist(playlistAtiva.id)
                 fecharDialogo()
               }}
-              className="rounded-full bg-red-500 px-5 py-2 text-sm font-bold text-white hover:bg-red-400"
+              className="rounded-full bg-rosa px-5 py-2 text-sm font-bold text-white hover:brightness-110"
             >
               Excluir
             </button>
@@ -278,7 +278,7 @@ function ListaVazia({ totalFaixas, busca, filtro, playlistAtiva, explorar }) {
   }
   return (
     <div className="flex flex-col items-center justify-center text-center gap-3 py-16 text-neutral-400">
-      <IconeMusica width={40} height={40} className="text-neutral-600" />
+      <IconeMusica width={40} height={40} className="text-violeta/60" />
       <p className="text-lg font-medium text-neutral-200">{titulo}</p>
       {texto && <p className="text-sm max-w-sm">{texto}</p>}
     </div>

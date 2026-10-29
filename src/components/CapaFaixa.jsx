@@ -6,13 +6,13 @@ export function CapaFaixa({ capa, titulo, tamanho = 'w-12 h-12' }) {
       <img
         src={capa}
         alt=""
-        className={`${tamanho} rounded object-cover shrink-0`}
+        className={`${tamanho} rounded-lg object-cover shrink-0`}
       />
     )
   }
   return (
     <div
-      className={`${tamanho} rounded shrink-0 bg-neutral-800 flex items-center justify-center text-neutral-500`}
+      className={`${tamanho} rounded-lg shrink-0 bg-gradient-to-br from-violeta/35 via-rosa/25 to-ambar/30 flex items-center justify-center text-white/70`}
       aria-hidden="true"
       title={titulo}
     >
