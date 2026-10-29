@@ -18,6 +18,25 @@ export const VERSAO_WEB = Number(import.meta.env.VITE_VERSAO_WEB) || 0
 
 const nativo = Capacitor.isNativePlatform()
 
+// Situação da atualização, mostrada discretamente no rodapé da lista pra
+// dar pra saber em que pé está sem precisar de um computador.
+let estado = nativo ? 'Procurando atualização…' : null
+const ouvintes = new Set()
+
+function definirEstado(novo) {
+  estado = novo
+  for (const ouvinte of ouvintes) ouvinte()
+}
+
+export function lerEstadoAtualizacao() {
+  return estado
+}
+
+export function ouvirEstadoAtualizacao(ouvinte) {
+  ouvintes.add(ouvinte)
+  return () => ouvintes.delete(ouvinte)
+}
+
 // Precisa rodar logo que o app abre: sem isso o plugin acha que o pacote
 // novo quebrou e volta pro anterior depois de alguns segundos.
 export function avisarAppPronto() {
@@ -28,12 +47,19 @@ export async function verificarAtualizacao() {
   if (!nativo) return
   try {
     const resposta = await fetch(URL_VERSAO, { cache: 'no-store' })
-    if (!resposta.ok) return
+    if (!resposta.ok) throw new Error(`versao.json respondeu ${resposta.status}`)
     const { versao, url, nativoMinimo } = await resposta.json()
-    if (!(versao > VERSAO_WEB)) return
+    if (!(versao > VERSAO_WEB)) {
+      definirEstado('App atualizado')
+      return
+    }
 
     const atual = await CapacitorUpdater.current()
-    if (Number(atual.native) < Number(nativoMinimo)) return
+    // O plugin devolve a versão nativa como "2.0.0".
+    if (parseFloat(String(atual.native)) < parseFloat(nativoMinimo)) {
+      definirEstado(`Versão ${versao} precisa de um APK novo`)
+      return
+    }
 
     // Apaga pacotes antigos e reaproveita o novo se já tiver sido baixado.
     const { bundles } = await CapacitorUpdater.list()
@@ -43,9 +69,14 @@ export async function verificarAtualizacao() {
         await CapacitorUpdater.delete({ id: b.id }).catch(() => {})
       }
     }
-    pacote ??= await CapacitorUpdater.download({ url, version: String(versao) })
+    if (!pacote) {
+      definirEstado(`Baixando a versão ${versao}…`)
+      pacote = await CapacitorUpdater.download({ url, version: String(versao) })
+    }
     await CapacitorUpdater.next({ id: pacote.id })
-  } catch {
+    definirEstado(`Versão ${versao} pronta: feche e abra o app`)
+  } catch (erro) {
     // Sem internet ou servidor fora do ar: tenta de novo na próxima abertura.
+    definirEstado(`Não deu pra atualizar (${erro?.message ?? erro})`)
   }
 }

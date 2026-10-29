@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react'
 import { Player } from './components/Player.jsx'
 import { Playlist } from './components/Playlist.jsx'
 import { TelaTocando } from './components/TelaTocando.jsx'
@@ -11,6 +11,7 @@ import { useFavoritos } from './hooks/useFavoritos.js'
 import { useMediaSession } from './hooks/useMediaSession.js'
 import { useMusicasImportadas } from './hooks/useMusicasImportadas.js'
 import { usePlaylists } from './hooks/usePlaylists.js'
+import { lerEstadoAtualizacao, ouvirEstadoAtualizacao, VERSAO_WEB } from './lib/atualizacao.js'
 import { faixas } from './lib/tracks.js'
 
 function normalizar(texto) {
@@ -51,6 +52,7 @@ export default function App() {
   const [busca, setBusca] = useState('')
   const [filtroEscolhido, setFiltro] = useState('todas')
   const [telaAberta, setTelaAberta] = useState(false)
+  const estadoAtualizacao = useSyncExternalStore(ouvirEstadoAtualizacao, lerEstadoAtualizacao)
 
   const idsSalvos = useMemo(() => new Set([...favoritos, ...playlists.flatMap((p) => p.faixas)]), [favoritos, playlists])
   const explorando = filtroEscolhido === 'explorar'
@@ -189,6 +191,11 @@ export default function App() {
           onExcluirPlaylist={excluir}
           onAlternarNaPlaylist={alternarFaixa}
         />
+        {estadoAtualizacao && (
+          <p className="pt-6 text-center text-xs text-neutral-600">
+            Versão {VERSAO_WEB || 'do APK'} · {estadoAtualizacao}
+          </p>
+        )}
       </main>
 
       <Player
