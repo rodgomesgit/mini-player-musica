@@ -36,7 +36,7 @@ export function TrackRow({ faixa, numero, ativa, tocando, duracao, favorita, onT
             {faixa.titulo}
           </span>
           <span className="block truncate text-xs text-neutral-400">
-            {faixa.importada ? 'Do celular · ' : ''}
+            {faixa.importada ? 'Do celular · ' : faixa.audius ? 'Audius · ' : ''}
             {faixa.artista}
           </span>
         </span>

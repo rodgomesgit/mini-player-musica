@@ -6,6 +6,7 @@ import { IconeAdicionar, IconeBusca, IconeMusica } from './Icones.jsx'
 
 const FILTROS_FIXOS = [
   { id: 'todas', rotulo: 'Todas' },
+  { id: 'explorar', rotulo: 'Explorar' },
   { id: 'online', rotulo: 'Online' },
   { id: 'favoritas', rotulo: 'Favoritas' },
   { id: 'celular', rotulo: 'Do celular' },
@@ -14,6 +15,8 @@ const FILTROS_FIXOS = [
 export function Playlist({
   faixas,
   todasFaixas,
+  totalBiblioteca,
+  explorar,
   idAtual,
   tocando,
   duracoes,
@@ -40,6 +43,8 @@ export function Playlist({
   const [dialogo, setDialogo] = useState(null)
   const fecharDialogo = () => setDialogo(null)
   const faixaDasOpcoes = dialogo?.opcoesDe ? todasFaixas.find((f) => f.id === dialogo.opcoesDe) : null
+  const explorando = filtro === 'explorar'
+  const total = playlistAtiva ? faixas.length : totalBiblioteca
 
   function aoEscolherArquivos(ev) {
     onImportar(ev.target.files)
@@ -51,10 +56,15 @@ export function Playlist({
     <div>
       <div className="px-3 pb-3 flex items-center justify-between gap-3">
         <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-3 min-w-0">
-          <h2 className="text-2xl font-bold truncate">{playlistAtiva?.nome ?? 'Sua playlist'}</h2>
+          <h2 className="text-2xl font-bold truncate">
+            {playlistAtiva?.nome ?? (explorando ? 'Explorar' : 'Sua playlist')}
+          </h2>
           <span className="text-sm text-neutral-400 whitespace-nowrap">
-            {playlistAtiva ? faixas.length : todasFaixas.length}{' '}
-            {(playlistAtiva ? faixas.length : todasFaixas.length) === 1 ? 'música' : 'músicas'}
+            {explorando
+              ? busca.trim()
+                ? 'Resultados no Audius'
+                : 'Em alta na semana no Audius'
+              : `${total} ${total === 1 ? 'música' : 'músicas'}`}
           </span>
         </div>
         {playlistAtiva ? (
@@ -74,7 +84,7 @@ export function Playlist({
               Excluir
             </button>
           </div>
-        ) : (
+        ) : explorando ? null : (
           <button
             type="button"
             onClick={() => inputArquivosRef.current?.click()}
@@ -102,7 +112,7 @@ export function Playlist({
             type="search"
             value={busca}
             onChange={(ev) => onBusca(ev.target.value)}
-            placeholder="Buscar por música ou artista"
+            placeholder={explorando ? 'Buscar músicas no Audius' : 'Buscar por música ou artista'}
             className="flex-1 min-w-0 bg-transparent text-sm text-white placeholder:text-neutral-400 outline-none"
             aria-label="Buscar na playlist"
           />
@@ -139,9 +149,15 @@ export function Playlist({
       </div>
 
       {faixas.length === 0 ? (
-        <ListaVazia totalFaixas={todasFaixas.length} busca={busca} filtro={filtro} playlistAtiva={playlistAtiva} />
+        <ListaVazia
+          totalFaixas={totalBiblioteca}
+          busca={busca}
+          filtro={filtro}
+          playlistAtiva={playlistAtiva}
+          explorar={explorar}
+        />
       ) : (
-        <div className="flex flex-col gap-0.5">
+        <div className={`flex flex-col gap-0.5 transition-opacity ${explorando && explorar.carregando ? 'opacity-50' : ''}`}>
           {faixas.map((faixa, indice) => (
             <TrackRow
               key={faixa.id}
@@ -157,6 +173,16 @@ export function Playlist({
             />
           ))}
         </div>
+      )}
+
+      {explorando && (
+        <p className="px-3 pt-6 text-center text-xs text-neutral-500">
+          Músicas de artistas independentes do{' '}
+          <a href="https://audius.co" target="_blank" rel="noreferrer" className="underline hover:text-neutral-300">
+            Audius
+          </a>
+          , tocadas direto da internet.
+        </p>
       )}
 
       {dialogo === 'nova' && (
@@ -223,10 +249,21 @@ export function Playlist({
   )
 }
 
-function ListaVazia({ totalFaixas, busca, filtro, playlistAtiva }) {
+function ListaVazia({ totalFaixas, busca, filtro, playlistAtiva, explorar }) {
   let titulo = 'Nenhuma música ainda'
   let texto = 'Toque em "Adicionar músicas" pra escolher arquivos de áudio do seu aparelho.'
-  if (totalFaixas > 0 && busca.trim()) {
+  if (filtro === 'explorar') {
+    if (explorar.carregando) {
+      titulo = 'Buscando…'
+      texto = ''
+    } else if (explorar.erro) {
+      titulo = 'Sem conexão com o Audius'
+      texto = 'Confira a internet e tente de novo.'
+    } else {
+      titulo = 'Nada encontrado'
+      texto = busca.trim() ? `Nenhuma música do Audius combina com "${busca.trim()}".` : ''
+    }
+  } else if (totalFaixas > 0 && busca.trim()) {
     titulo = 'Nada encontrado'
     texto = `Nenhuma música combina com "${busca.trim()}".`
   } else if (playlistAtiva) {
@@ -243,7 +280,7 @@ function ListaVazia({ totalFaixas, busca, filtro, playlistAtiva }) {
     <div className="flex flex-col items-center justify-center text-center gap-3 py-16 text-neutral-400">
       <IconeMusica width={40} height={40} className="text-neutral-600" />
       <p className="text-lg font-medium text-neutral-200">{titulo}</p>
-      <p className="text-sm max-w-sm">{texto}</p>
+      {texto && <p className="text-sm max-w-sm">{texto}</p>}
     </div>
   )
 }

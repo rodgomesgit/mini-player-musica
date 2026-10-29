@@ -3,6 +3,7 @@ import { Player } from './components/Player.jsx'
 import { Playlist } from './components/Playlist.jsx'
 import { TelaTocando } from './components/TelaTocando.jsx'
 import { useAudioPlayer } from './hooks/useAudioPlayer.js'
+import { useAudius } from './hooks/useAudius.js'
 import { useCapasEmbutidas } from './hooks/useCapasEmbutidas.js'
 import { useCatalogoOnline } from './hooks/useCatalogoOnline.js'
 import { useDuracoesFaixas } from './hooks/useDuracoesFaixas.js'
@@ -51,6 +52,10 @@ export default function App() {
   const [filtroEscolhido, setFiltro] = useState('todas')
   const [telaAberta, setTelaAberta] = useState(false)
 
+  const idsSalvos = useMemo(() => new Set([...favoritos, ...playlists.flatMap((p) => p.faixas)]), [favoritos, playlists])
+  const explorando = filtroEscolhido === 'explorar'
+  const audius = useAudius(explorando, busca, idsSalvos)
+
   // A tela cheia ganha uma entrada no histórico: assim o "voltar" do Android
   // fecha a tela em vez de sair do app.
   useEffect(() => {
@@ -72,14 +77,22 @@ export default function App() {
   // precisam ser lidas do arquivo.
   const locais = useMemo(() => [...faixas, ...importadas], [importadas])
   const capasEmbutidas = useCapasEmbutidas(locais)
-  const todas = useMemo(
+  // Biblioteca: o que aparece em "Todas" (inclui as do Audius que foram
+  // favoritadas ou postas em playlist).
+  const biblioteca = useMemo(
     () => [
       ...faixas,
       ...online,
       ...importadas,
+      ...audius.salvas,
     ].map((faixa) => (faixa.capa || !capasEmbutidas[faixa.id] ? faixa : { ...faixa, capa: capasEmbutidas[faixa.id] })),
-    [online, importadas, capasEmbutidas],
+    [online, importadas, audius.salvas, capasEmbutidas],
   )
+  // Tudo que pode tocar: a biblioteca mais as do Audius vistas nesta sessão.
+  const todas = useMemo(() => {
+    const naBiblioteca = new Set(biblioteca.map((f) => f.id))
+    return [...biblioteca, ...audius.conhecidas.filter((f) => !naBiblioteca.has(f.id))]
+  }, [biblioteca, audius.conhecidas])
 
   // Se a playlist aberta for excluída, volta pra lista com todas.
   const playlistAtiva = filtroEscolhido.startsWith('playlist:')
@@ -88,10 +101,12 @@ export default function App() {
   const filtro = filtroEscolhido.startsWith('playlist:') && !playlistAtiva ? 'todas' : filtroEscolhido
 
   const visiveis = useMemo(() => {
+    // No Explorar a busca já foi feita no Audius.
+    if (filtro === 'explorar') return audius.resultados
     const termo = normalizar(busca.trim())
     const base = playlistAtiva
       ? playlistAtiva.faixas.map((id) => todas.find((f) => f.id === id)).filter(Boolean)
-      : todas
+      : biblioteca
     return base.filter((faixa) => {
       if (filtro === 'favoritas' && !favoritos.has(faixa.id)) return false
       if (filtro === 'celular' && !faixa.importada) return false
@@ -99,14 +114,14 @@ export default function App() {
       if (!termo) return true
       return normalizar(`${faixa.titulo} ${faixa.artista}`).includes(termo)
     })
-  }, [todas, busca, filtro, favoritos, playlistAtiva])
+  }, [todas, biblioteca, busca, filtro, favoritos, playlistAtiva, audius.resultados])
 
   const player = useAudioPlayer(visiveis, todas)
   const duracoesLocais = useDuracoesFaixas(locais)
   const duracoes = useMemo(() => {
-    const doBanco = Object.fromEntries(online.filter((f) => f.duracao).map((f) => [f.id, f.duracao]))
-    return { ...doBanco, ...duracoesLocais }
-  }, [online, duracoesLocais])
+    const conhecidas = [...online, ...audius.conhecidas].filter((f) => f.duracao)
+    return { ...Object.fromEntries(conhecidas.map((f) => [f.id, f.duracao])), ...duracoesLocais }
+  }, [online, audius.conhecidas, duracoesLocais])
 
   const { tocar, pausar, proxima, anterior, buscar } = player
   const acoesMidia = useMemo(
@@ -148,6 +163,8 @@ export default function App() {
         <Playlist
           faixas={visiveis}
           todasFaixas={todas}
+          totalBiblioteca={biblioteca.length}
+          explorar={{ carregando: audius.carregando, erro: audius.erro }}
           idAtual={player.idAtual}
           tocando={player.tocando}
           duracoes={duracoes}
